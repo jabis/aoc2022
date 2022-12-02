@@ -88,6 +88,7 @@ const day1 = require('./01/day1'),
         case "LOSE":
           for(ix=1;ix<4;ix++){
             let r = proc(elfv,ix)
+            if(debug) console.log("r",r, s2[v2[iz]]);
             if(r==act) t2.me += s2[v2[ix]]+p2.l;
           }
         break;
