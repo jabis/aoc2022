@@ -112,6 +112,7 @@ const day1 = require('./01/day1'),
       console.time('day3');
       let inp = await rf('./03/input');
       let rucksacks = await day3(inp);
+      
       let cr = (sk,l,c,s=false)=>{
         let obj = {}
         for (const n of Array(l).keys()) {
@@ -144,7 +145,7 @@ const day1 = require('./01/day1'),
       }).reduce((o,v)=>o+v,0);
       
       console.log("Total Part 1",part1); 
-      rucksacks = await day3(inp,1); // reset rucksacks for part 2 as we meddled with splice above
+      rucksacks = await day3(inp); // reset rucksacks for part 2 as we meddled with splice above
       let chks = 3;
       let part2 = rucksacks.reduce((arr, it, idx) => { 
         const ci = Math.floor(idx/chks);
