@@ -1,8 +1,9 @@
-const debug = false;
+const debug = true;
 const rf = require('./rf');
 const day1 = require('./01/day1'),
   day2 = require('./02/day2'),
-  day3 = require('./03/day3');
+  day3 = require('./03/day3'),
+  day4 = require('./04/day4');
 (async ()=>{
   await new Promise(async(r,b)=>{
     console.log("==========Start Day1==========")
@@ -89,7 +90,7 @@ const day1 = require('./01/day1'),
         case "LOSE":
           for(ix=1;ix<4;ix++){
             let r = proc(elfv,ix)
-            if(debug) console.log("r",r, s2[v2[iz]]);
+            if(debug) console.log("r",r, s2[v2[ix]]);
             if(r==act) t2.me += s2[v2[ix]]+p2.l;
           }
         break;
@@ -165,15 +166,64 @@ const day1 = require('./01/day1'),
           return 0
         }).reduce((a,b)=>a+b,0);
         if(badge){
-          if(debug) console.log(`Chunk ${idx} ${badge} ${tot} ${sm}`);
+          if(debug) console.log(`Chunk ${idx} ${badge} ${sm}`);
           return sm;
         }
         return 0
-      }).reduce((a,b)=>{return a+b},0);
+      }).reduce((a,b)=>a+b,0);
 
       console.log("Total for Part 2",part2)
       console.timeEnd('day3');
       console.log("=============EOF Day3===========")
-      return r()
+      return r({part1,part2})
+    })
+    await new Promise(async(r,b)=>{
+      console.log("==========Start Day1==========")
+      console.time('day4');
+      let inp = await rf('./04/input');
+      let pairs = await day4(inp);
+      function fop(prs) {
+        let olap = [];
+        for (let i = 0; i < prs.length; i++) {
+          let p1 = prs[i];
+          for (let j = i + 1; j < prs.length; j++) {
+            let p2 = prs[j];
+            if (p1[0] <= p2[1] && p2[0] <= p1[1]) {
+              olap.push(p1);
+              olap.push(p2);
+            }
+          }
+        }
+        return olap;
+      }
+      function fcont(prs) {
+        let full = 0;
+        for (let i = 0; i < prs.length; i++) {
+            let p1 = prs[i];
+            for (let j = i + 1; j < prs.length; j++) {
+                let p2 = prs[j];
+                if ((p1[0] >= p2[0] && p1[1] <= p2[1]) || (p1[0] <= p2[0] && p1[1] >= p2[1])) {
+                  if(debug) console.log("HIT",p1,p2);
+                  full++;
+                }
+            }
+        }
+        return full;
+      }
+      let part2 = 0;
+      let part1 = pairs.reduce((prev,pair)=>{
+        let overlap = fop(pair);
+        if(debug) console.log(`Some overlap: `,overlap);
+        let fcp = fcont(pair);
+        if(debug &&fcp>0) console.log(`Fully contained: `,fcp)
+        if(overlap.length) part2 += 1;
+        if(fcp>0) prev += fcp;
+        return prev;
+      },0)
+      console.log(`Part 1 total: ${part1}`)
+      console.log(`Part 2 overlaps: ${part2}`)
+      console.timeEnd('day4');
+      console.log("=============EOF Day4===========")
+      return r({part1,part2});
     })
   })()
