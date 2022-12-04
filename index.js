@@ -6,7 +6,7 @@ const day1 = require('./01/day1'),
   day4 = require('./04/day4');
 (async ()=>{
   await new Promise(async(r,b)=>{
-    console.log("==========Start Day1==========")
+    console.log("============Start Day1==========")
     console.time('day1');
     let i = await rf('./01/input');
     let elves = await day1(i);
@@ -20,7 +20,7 @@ const day1 = require('./01/day1'),
     return r({part1,part2})
   })
   await new Promise(async(r,b)=>{
-    console.log("==========Start Day2==========")
+    console.log("============Start Day2==========")
     console.time('day2');
     let i = await rf('./02/input');
     let l = {A:"ROCK",B:"PAPER",C:"SCISSORS",X:"ROCK",Y:"PAPER",Z:"SCISSORS"}
@@ -109,7 +109,7 @@ const day1 = require('./01/day1'),
     return r({t,t2})
     })
     await new Promise(async(r,b)=>{
-      console.log("==========Start Day3==========")
+      console.log("============Start Day3==========")
       console.time('day3');
       let inp = await rf('./03/input');
       let rucksacks = await day3(inp);
@@ -178,7 +178,7 @@ const day1 = require('./01/day1'),
       return r({part1,part2})
     })
     await new Promise(async(r,b)=>{
-      console.log("==========Start Day4==========")
+      console.log("============Start Day4==========")
       console.time('day4');
       let inp = await rf('./04/input');
       let pairs = await day4(inp);
