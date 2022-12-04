@@ -199,14 +199,14 @@ const day1 = require('./01/day1'),
       function fcont(prs) {
         let full = 0;
         for (let i = 0; i < prs.length; i++) {
-            let p1 = prs[i];
-            for (let j = i + 1; j < prs.length; j++) {
-                let p2 = prs[j];
-                if ((p1[0] >= p2[0] && p1[1] <= p2[1]) || (p1[0] <= p2[0] && p1[1] >= p2[1])) {
-                  if(debug) console.log("HIT",p1,p2);
-                  full++;
-                }
+          let p1 = prs[i];
+          for (let j = i + 1; j < prs.length; j++) {
+            let p2 = prs[j];
+            if ((p1[0] >= p2[0] && p1[1] <= p2[1]) || (p1[0] <= p2[0] && p1[1] >= p2[1])) {
+              if (debug) console.log("HIT", p1, p2);
+              full++;
             }
+          }
         }
         return full;
       }
