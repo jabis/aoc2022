@@ -1,4 +1,4 @@
-const debug = true;
+const debug = false;
 const rf = require('./rf');
 const day1 = require('./01/day1'),
   day2 = require('./02/day2'),
@@ -178,7 +178,7 @@ const day1 = require('./01/day1'),
       return r({part1,part2})
     })
     await new Promise(async(r,b)=>{
-      console.log("==========Start Day1==========")
+      console.log("==========Start Day4==========")
       console.time('day4');
       let inp = await rf('./04/input');
       let pairs = await day4(inp);
