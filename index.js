@@ -322,6 +322,7 @@ const day1 = require('./01/day1'),
         part2 +=getFirst(seconds).available;
       }
       console.log("Answer for part2: DID NOT QUALIFY",part2);
+      console.timeEnd('day5')
       return r({part1,part2})
     })
   })()
