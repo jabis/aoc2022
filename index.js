@@ -3,7 +3,8 @@ const rf = require('./rf');
 const day1 = require('./01/day1'),
   day2 = require('./02/day2'),
   day3 = require('./03/day3'),
-  day4 = require('./04/day4');
+  day4 = require('./04/day4'),
+  day5 = require('./05/day5');
 (async ()=>{
   await new Promise(async(r,b)=>{
     console.log("============Start Day1==========")
@@ -225,5 +226,102 @@ const day1 = require('./01/day1'),
       console.timeEnd('day4');
       console.log("=============EOF Day4===========")
       return r({part1,part2});
+    })
+    await new Promise(async(r,b)=>{
+      console.log("============Start Day5==========")
+      console.time('day5');
+      let inp = await rf('./05/input');
+      let {matrix,movearr,dimensions} = await day5(inp);
+      //console.table(matrix);
+      //console.log(movearr);
+      let res = [];
+      let spc = ' ';
+      function getFirst(column){
+        //console.log("picking first row",column);
+        let positions = matrix.length-1;
+        let available = false;
+        for(let x = 0; x<=positions; x++){
+          let rowi = matrix[x][column];
+          available = rowi != " " ? rowi : false;
+          if(available !== false) return {row:x,column, available};
+        }
+        return available;
+      }
+      function scanEmpty(column){
+        let positions = matrix.length-1;
+        let available = false;
+        for(let x = positions; x>=0; x--){
+          let rowi = matrix[x][column];
+          available = (rowi == " " || typeof rowi == undefined) ? x : false;
+          if(available !== false) return {row:x,column};
+        }
+        return available;
+      }
+      function move(p1,p2){
+        if(matrix[0][p2] != " ") {
+          let howmany = dimensions[0];
+          let newrow = []
+          for(z=0;z<=howmany;z++){
+            newrow.push(' ');
+          }
+          matrix.unshift(newrow);
+        }
+        let available = scanEmpty(p2);
+        if(available !== false) {
+          let first = getFirst(p1);
+          matrix[available.row][available.column] = first.available;
+          matrix[first.row][first.column] = ' '; 
+        } 
+      }
+      
+      function movebatch(many,from,to){
+        if(many<1) return;
+        for(let x=0; x<many; x++){
+          move(from,to);
+        }
+      }
+      for(const [howmany,from,to] of movearr){
+        movebatch(howmany,from-1,to-1);
+      }
+      let part1 = "";
+      for(let firsts=0; firsts<dimensions[0]; firsts++){
+        part1 +=getFirst(firsts).available;
+      }
+      console.table(matrix);
+      console.log("Answer for part1:",part1);
+      let {matrix:m1,movearr:m2, dimensions:m3} = await day5(inp); //restart the matrix
+      matrix = m1;
+      movearr = m2;
+      dimensions = m3;
+      matrix.map(m=>{
+         m.push(' ')
+      })
+      let offsite = matrix.length; // let's give a switchlane
+      dimensions[0] = dimensions[0]+1;
+      //console.log(matrix,movearr,dimensions);
+      function movemulti(many,from,to){
+        let {row:firstrow,column} = getFirst(from);
+        let movables = []
+        for(let sr=firstrow;sr<(firstrow+many);sr++){
+          let moving = matrix[sr][column];
+          move(from, offsite)
+        }
+        for(let zz = 0; zz<many; zz++){
+           move(offsite,to);
+        }
+        //console.log(movables);
+        //console.table(matrix);  
+      }
+      
+      for(const [howmany,from,to] of movearr){
+        movemulti(howmany,from-1,to-1);
+      }
+      console.table(matrix)
+      let part2 = "" 
+      for(let seconds=0; seconds<dimensions[0]; seconds++){
+        part2 +=getFirst(seconds).available;
+      }
+      console.log("Answer for part2: DID NOT QUALIFY",part2);
+      return r({part1,part2})
     })
   })()
