@@ -288,7 +288,7 @@ const day1 = require('./01/day1'),
       for(let firsts=0; firsts<dimensions[0]; firsts++){
         part1 +=getFirst(firsts).available;
       }
-      console.table(matrix);
+      if(debug) console.table(matrix);
       console.log("Answer for part1:",part1);
       let {matrix:m1,movearr:m2, dimensions:m3} = await day5(inp); //restart the matrix
       matrix = m1;
@@ -317,12 +317,12 @@ const day1 = require('./01/day1'),
       for(const [howmany,from,to] of movearr){
         movemulti(howmany,from-1,to-1);
       }
-      console.table(matrix)
+      if(debug) console.table(matrix)
       let part2 = "" 
       for(let seconds=0; seconds<dimensions[0]; seconds++){
         part2 +=getFirst(seconds).available;
       }
-      console.log("Answer for part2: DID NOT QUALIFY",part2);
+      console.log("Answer for part2: DID NOT FINISH");
       console.timeEnd('day5')
       return r({part1,part2})
     })
