@@ -222,8 +222,8 @@ const day1 = require('./01/day1'),
         if(fcp>0) prev += fcp;
         return prev;
       },0)
-      console.log(`Part 1 total: ${part1}`)
-      console.log(`Part 2 overlaps: ${part2}`)
+      console.log(`Part 1 total:`, part1)
+      console.log(`Part 2 overlaps:`, part2)
       console.timeEnd('day4');
       console.log("=============EOF Day4===========")
       return r({part1,part2});
