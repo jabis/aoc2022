@@ -4,7 +4,8 @@ const day1 = require('./01/day1'),
   day2 = require('./02/day2'),
   day3 = require('./03/day3'),
   day4 = require('./04/day4'),
-  day5 = require('./05/day5');
+  day5 = require('./05/day5'),
+  day6 = require('./06/day6');
 (async ()=>{
   await new Promise(async(r,b)=>{
     console.log("============Start Day1==========")
@@ -324,5 +325,33 @@ const day1 = require('./01/day1'),
       console.log("Answer for part2: DID NOT QUALIFY",part2);
       console.timeEnd('day5')
       return r({part1,part2})
+    })
+    await new Promise(async(r,b)=>{
+      console.log("============Start Day6==========")
+      console.time('day6');
+      let inp = await rf('./06/input');
+      let stream = await day6(inp);
+      function decode(str, len) {
+        const uniq = [];
+        for (let i = 0; i < str.length; i++) {
+          const char = str[i];
+          uniq.push(char);
+          uniq.splice(0, uniq.length - len);
+          if (new Set(uniq).size === len) {
+            return i + 1;
+          }
+        }
+      }
+      let [part1,part2] = stream.reduce((p,s)=>{ 
+        if(!p) p = []
+        let part1 = decode(s,4);
+        let part2 = decode(s,14);
+        p.push(part1,part2)
+        return p;
+      },[]);
+      console.log("Answer for part1: ",part1);
+      console.log("Answer for part2: ",part2);
+      console.timeEnd('day6')
+      return r({part1})
     })
   })()
