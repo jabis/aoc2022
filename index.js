@@ -351,7 +351,8 @@ const day1 = require('./01/day1'),
       },[]);
       console.log("Answer for part1: ",part1);
       console.log("Answer for part2: ",part2);
-      console.timeEnd('day6')
+      console.timeEnd('day6');
+      console.log("=============EOF Day6===========")
       return r({part1})
     })
   })()
