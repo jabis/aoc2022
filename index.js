@@ -5,7 +5,9 @@ const day1 = require('./01/day1'),
   day3 = require('./03/day3'),
   day4 = require('./04/day4'),
   day5 = require('./05/day5'),
-  day6 = require('./06/day6');
+  day6 = require('./06/day6'),
+  day7 = require('./07/day7')
+  ;
 (async ()=>{
   await new Promise(async(r,b)=>{
     console.log("============Start Day1==========")
@@ -353,6 +355,68 @@ const day1 = require('./01/day1'),
       console.log("Answer for part2: ",part2);
       console.timeEnd('day6');
       console.log("=============EOF Day6===========")
-      return r({part1})
+      return r({part1,part2})
+    })
+    await new Promise(async(r,b)=>{
+      console.log("============Start Day7==========")
+      console.time('day7');
+      let inp = await rf('./07/input');
+      let {fsm,input:prompt} = await day7(inp);
+
+      let iscmd = new RegExp(/^\$/, 'g');
+      prompt.split('\n').map(line=>{
+        if (line.match(iscmd)) {
+          line = line.replace('$ ', '');
+        }
+        else {
+          let l = line.split(' '),
+          first = l.shift(),
+          second = l.shift(),
+          dof = first == "dir" ? true : false;
+          if (dof) {
+            line = `mkdir ${second}`;
+          } else {
+            line = `add ${first} ${second}`
+          }
+        }
+        return line;
+      }).map(line => {
+        if(debug) console.log("line", line);
+        fsm.execute(line)
+        return line;
+      })
+      //console.log(fsm);
+      fsm.cd('/');
+      let part1 = 0;
+      for(let [i,s] of Object.entries(fsm.folderSizes)){
+        if(s<=100000){
+          if(debug) console.log("s?",s, "i?",i)
+          part1+=parseInt(s);
+        }  
+      }
+      if(debug) console.log("total space", fsm.diskspace, "usedspace", fsm.usedspace,"required", fsm.updaterequires,"free space", (fsm.diskspace-fsm.usedspace));
+      let current = fsm.diskspace-fsm.usedspace;
+      let missing = fsm.updaterequires-current;
+      if(debug) console.log("missing", missing, current-missing);
+      let sorted = Object.entries(fsm.folderSizes).filter(i=>{
+        return (i[1]>=missing) ?i:false;
+      }).sort((a,b)=>a[1]-b[1])
+      
+      if(debug) console.log("sorted",sorted);
+      console.log("Answer for part1: ",part1);
+      let part2 = 0;
+      if(sorted.length){
+        let min = sorted.shift();
+        let subs = fsm.getSubfolderSizes(min[0]);
+        part2 = Object.values(subs.children).reduce((p,v)=>{
+
+          if(v.total>missing) p=v.total;
+          return p;
+        },0)
+      }
+      console.log("Answer for part2: ",part2);
+      console.timeEnd('day7');
+      console.log("=============EOF Day7===========")
+      return r({part1,part2})
     })
   })()
