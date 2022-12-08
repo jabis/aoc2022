@@ -6,7 +6,8 @@ const day1 = require('./01/day1'),
   day4 = require('./04/day4'),
   day5 = require('./05/day5'),
   day6 = require('./06/day6'),
-  day7 = require('./07/day7')
+  day7 = require('./07/day7'),
+  day8 = require('./08/day8')
   ;
 (async ()=>{
   await new Promise(async(r,b)=>{
@@ -417,6 +418,63 @@ const day1 = require('./01/day1'),
       console.log("Answer for part2: ",part2);
       console.timeEnd('day7');
       console.log("=============EOF Day7===========")
+      return r({part1,part2})
+    })
+    await new Promise(async(r,b)=>{
+      console.log("============Start Day8==========")
+      console.time('day8');
+      let inp = await rf('./08/input');      
+      let grid = await day8(inp);
+      const vface = [
+        [-1, 0],
+        [0, -1],
+        [0, 1],
+        [1, 0],
+      ];
+      function getVis(g) {
+        let v = g.map(r => r.map(() => 0)),e=vface;
+        for (let i = 0; i < g.length; i++) {
+          for (let j = 0; j < g[i].length; j++) {
+            a: for (const [ei, ej] of e) {
+              let [i2, j2] = [i + ei, j + ej];
+              for (;i2 >= 0 && j2 >= 0 && i2 < g.length && j2 < g[i2].length; i2 += ei, j2 += ej) {
+                if (g[i2][j2] >= g[i][j]) continue a;
+              }
+              v[i][j] = 1;
+              break;
+            }
+          }
+        }
+        return v;
+      }
+      function getScore(g) {
+        let v = g.map(r => r.map(() => 1)),e=vface;
+        for (let i = 0; i < g.length; i++) {
+          for (let j = 0; j < g[i].length; j++) {
+           for (const [ei, ej] of e) {
+              let [i2, j2] = [i + ei, j + ej];
+              for (;i2 >= 0 && j2 >= 0 && i2 < g.length && j2 < g[i2].length; i2 += ei, j2 += ej) {
+                if (g[i2][j2] >= g[i][j]) {
+                  i2 += ei;
+                  j2 += ej;
+                  break;
+                }
+              }
+              v[i][j] *= Math.abs(i2 - ei - i) + Math.abs(j2 - ej - j);
+            }
+          }
+        }
+        return v;
+      }
+      
+      let vis = getVis(grid);
+      let part1 = vis.flat().reduce((p, v)=>p + v,0);
+      let scores = getScore(grid);
+      let part2 = Math.max(...scores.flat());
+      console.log("Answer for part1: ",part1);
+      console.log("Answer for part2: ",part2);
+      console.timeEnd('day8');
+      console.log("=============EOF Day8===========")
       return r({part1,part2})
     })
   })()
