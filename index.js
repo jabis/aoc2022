@@ -1,5 +1,7 @@
-const debug = false;
+const debug = false,
+  printout = true;
 const rf = require('./rf');
+const fs = require('fs');
 const day1 = require('./01/day1'),
   day2 = require('./02/day2'),
   day3 = require('./03/day3'),
@@ -7,7 +9,8 @@ const day1 = require('./01/day1'),
   day5 = require('./05/day5'),
   day6 = require('./06/day6'),
   day7 = require('./07/day7'),
-  day8 = require('./08/day8')
+  day8 = require('./08/day8'),
+  day9 = require('./09/day9')
   ;
 (async ()=>{
   await new Promise(async(r,b)=>{
@@ -425,6 +428,7 @@ const day1 = require('./01/day1'),
       console.time('day8');
       let inp = await rf('./08/input');      
       let grid = await day8(inp);
+      if(debug) console.log(grid);
       const vface = [
         [-1, 0],
         [0, -1],
@@ -475,6 +479,108 @@ const day1 = require('./01/day1'),
       console.log("Answer for part2: ",part2);
       console.timeEnd('day8');
       console.log("=============EOF Day8===========")
+      return r({part1,part2})
+    })
+    await new Promise(async(r,b)=>{
+      console.log("============Start Day9==========")
+      console.time('day9');
+      let inp = await rf('./09/input');      
+      let moves = await day9(inp);
+      
+      let state = {
+        h:{curr:[0,0],visited:[],moves:new Set()},
+        t:{curr:[0,0],visited:[],moves:new Set()},
+      }
+      function visit(which,pos){
+        if(state.hasOwnProperty(which)){
+          state[which].moves.add(JSON.stringify(pos));
+          state[which].visited.push(pos)
+        }
+      }
+      
+      let m ={
+        'R':[1,0],
+        'L':[-1,0],
+        'U':[0,1],
+        'D':[0,-1]
+      }
+      let chk = [
+        [0,1],
+        [0,-1],
+        [1,0],
+        [-1,0],
+        [1,1],
+        [1,-1],
+        [-1,1],
+        [-1,-1],
+      ]
+      let scan = (a, b) => {
+        return (
+          (a[0] === b[0] && a[1] === b[1]) ||
+          chk.some(
+            (c) => b[0] + c[0] === a[0] && b[1] + c[1] === a[1],
+          )
+        )
+      }
+      visit('h',[0,0])
+      visit('t',[0,0])
+      moves.map(move=>{
+        let hc = state.h.curr;
+        let tc = state.t.curr;
+        let cmd = move.shift();
+        let cnt = move.shift();
+        let [dx, dy] = m[cmd];
+        let endPos = [hc[0] + dx *cnt, hc[1] + dy * cnt];
+        let between = [];
+        while(cnt--){
+          if(!cnt) break;
+          let x = [hc[0] + dx *cnt, hc[1] + dy * cnt];
+          between.push(x);
+        }
+        if(between.length){
+          between.reverse().map(b=>{
+            tc = state.t.curr;
+            hc = state.h.curr = b;            
+            visit('h',b);
+            let isAdjacent = scan(hc,tc);
+            if(!isAdjacent){
+              let hprev = state.h.visited[state.h.visited.length-2];
+              let tlast = state.t.visited[state.t.visited.length-1];
+              let vis = state.t.visited.some(x=>{return x[0] == hprev[0] && x[1]== hprev[1] ? true : false;});
+              if(debug) console.log("move the tail (between) head now",hc,"<head previous | tail next>",hprev, "tail last",tlast, "move already recorded",vis);
+              tc = state.t.curr = hprev;
+              if(!vis) visit('t',hprev);
+            }
+
+            return b;
+          })
+        }
+        tc = state.t.curr;
+        hc = state.h.curr = endPos; 
+        visit('h', endPos);
+      
+        let isAdjacent = scan(hc,tc);
+        if(!isAdjacent){
+          let hpr = state.h.visited[state.h.visited.length-2];
+          let tla = state.t.visited[state.t.visited.length-1];
+          let vis = state.t.visited.some(x=>{return x[0] == hpr[0] && x[1]== hpr[1] ? true : false;});
+          if(debug) console.log("move the tail (last), head now",hc,"<head previous | tail next>",hpr, "tail last",tla, "move already recorded",vis)
+          tc = state.t.curr = hpr;
+          if(!vis) visit('t',hpr);
+        }
+      })
+      //let head = state.h.visited;
+      let tail = state.t.visited;
+      if(printout){
+        let out = JSON.stringify(state)
+        fs.writeFileSync('./output.json',out)
+      }
+      let part1 =tail.length,
+        part2;
+      console.log("Answer for part1",part1);
+      console.log("Answer for part2: DID NOT FINISH");
+      console.timeEnd('day9');
+      console.log("=============EOF Day9===========")
       return r({part1,part2})
     })
   })()
