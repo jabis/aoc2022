@@ -10,7 +10,9 @@ const day1 = require('./01/day1'),
   day6 = require('./06/day6'),
   day7 = require('./07/day7'),
   day8 = require('./08/day8'),
-  day9 = require('./09/day9')
+  day9 = require('./09/day9'),
+  day10 = require('./10/day10')
+
   ;
 (async ()=>{
   await new Promise(async(r,b)=>{
@@ -581,6 +583,60 @@ const day1 = require('./01/day1'),
       console.log("Answer for part2: DID NOT FINISH");
       console.timeEnd('day9');
       console.log("=============EOF Day9===========")
+      return r({part1,part2})
+    })
+    await new Promise(async(r,b)=>{
+      console.log("============Start Day10==========")
+      console.time('day10');
+      let inp = await rf('./10/input');      
+      let program = await day10(inp);
+      let duration = program.reduce((a,b)=>a+b.duration,0);
+      let x = 1;
+      let cycle = 0;
+      let spendcycle = 0;
+      let signalStrengths = [];
+      let ci = 0;
+      let queue = [],
+        ints =[20, 60, 100, 140, 180, 220],
+        display=[];
+      while (ci < duration) {
+        const instruction = program[ci];
+        let llen = 40, ln = Math.floor(cycle / llen);
+        cycle++;
+        spendcycle++;
+        if(debug) console.log(`Starting ${cycle} with queue length`,queue.length);
+        if(instruction){
+          if (instruction.type === "addx") {
+            spendcycle++
+            queue.push({value:instruction.value, sp:spendcycle})
+          } else {
+            queue.push({value:0, sp:spendcycle})
+          }
+        }
+        if (!display[ln]) display[ln] = new Array(llen).fill(" ");
+        if (cycle - ln * llen >= x && cycle - ln * llen <= x + 2) display[ln][cycle - 1 - ln * llen] = "█";
+        if (ints.some(i=>{ return i==cycle; })) {
+          const signalStrength = cycle * x;
+          if(debug) console.log(`cycle ${cycle} currval = ${x} signal strength is ${signalStrength} `)
+          signalStrengths.push(signalStrength);
+        }
+        if(debug) console.log(`X on ${cycle} is ${x}`)
+        queue = queue.filter(item=>{
+          if(item.sp == cycle){
+            if(debug) console.log("processing assignment",item);
+            x= x+item.value;
+            if(debug) console.log(`X at the end of ${cycle} is now ${x}`) 
+          }
+          return cycle < item.sp ? item : false 
+        })
+        ci++;
+      }
+      let part1 = signalStrengths.reduce((a, b) => a + b, 0),
+      part2 = display.join("\n");
+      console.log("Answer for part1",part1);
+      console.log("Answer for part2:\n",part2);
+      console.timeEnd('day10');
+      console.log("=============EOF Day10===========")
       return r({part1,part2})
     })
   })()
