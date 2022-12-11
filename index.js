@@ -11,7 +11,8 @@ const day1 = require('./01/day1'),
   day7 = require('./07/day7'),
   day8 = require('./08/day8'),
   day9 = require('./09/day9'),
-  day10 = require('./10/day10')
+  day10 = require('./10/day10'),
+  day11 = require('./11/day11')
 
   ;
 (async ()=>{
@@ -637,6 +638,49 @@ const day1 = require('./01/day1'),
       console.log("Answer for part2:\n",part2);
       console.timeEnd('day10');
       console.log("=============EOF Day10===========")
+      return r({part1,part2})
+    })
+    await new Promise(async(r,b)=>{
+      console.log("============Start Day11==========")
+      console.time('day11');
+      let inp = await rf('./11/input');      
+      
+      let runner = (monkeys,round=1,cnt=0,maxrounds=20)=>{
+        let modulo = 1;
+        for (let m of monkeys){
+          modulo *= +m.divby;
+        }
+        if(debug) console.log("combinated modulo",modulo);
+        while (cnt<maxrounds) {
+          for (let monkey of monkeys) {
+            if (monkey.items.length === 0) continue;
+            if(!monkey.hasOwnProperty('monkeyBusiness')) monkey.monkeyBusiness = 0;
+            while (monkey.items.length) {
+              let worryLevel = monkey.items.shift();
+              monkey.monkeyBusiness++;
+              worryLevel = monkey.op(worryLevel, worryLevel);
+              if(maxrounds == 20) worryLevel = Math.floor(worryLevel / 3);
+              else worryLevel %= modulo;
+              let destination = monkey.tst(worryLevel) ? monkey.iftrue : monkey.iffalse;
+              monkeys[destination].items.push(worryLevel);
+            }
+          }
+          round++;
+          cnt++;
+        }
+        let monkeybusiness = monkeys.sort((a,b)=>a.monkeyBusiness-b.monkeyBusiness);
+        let product = monkeybusiness.slice(-2).map(i=>i.monkeyBusiness).reduce((a,b)=>{
+          return a * b
+        },1)
+        return product;
+      }
+
+      let part1=runner(await day11(inp),1,0,20),
+        part2=runner(await day11(inp),1,0,10000);
+      console.log("Answer for part1",part1);
+      console.log("Answer for part2:\n",part2);
+      console.timeEnd('day11');
+      console.log("=============EOF Day11===========")
       return r({part1,part2})
     })
   })()
