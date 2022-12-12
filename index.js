@@ -691,11 +691,9 @@ const day1 = require('./01/day1'),
       const {map,start,end,BFS} = await day12(inp);
       //console.log(map);
       let search = new BFS(map,"length");  
-      let something = search.shortestPath(end, start);
-      console.log(something);
-      let part1, 
+      let part1 =search.shortestPath(end, start), 
         part2;
-      console.log("Answer for part1: DID NOT FINISH");
+      console.log("Answer for part1",part1);
       console.log("Answer for part2: DID NOT FINISH");
       console.timeEnd('day12');
       console.log("=============EOF Day12===========")

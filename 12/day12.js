@@ -83,7 +83,7 @@ class BFS {
     let cid = p.charcode,
       nid=p.charcode;
     if (parent) nid = parent.charcode;
-    if (cid - 1 == nid || nid == cid || cid + 1 == nid){
+    if (nid <= cid || cid + 1 == nid){
       if (dist < p.dist) {
         this.visited.set(`${x},${y}`,p)
         p.dist = dist;
