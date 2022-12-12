@@ -60,7 +60,6 @@ class BFS {
       this.visit(cells, queue, p.x, p.y + 1, p);
     }
     if (dest == null) {
-      console.log("there is no path.");
       return this.out =="length" ? 0 : this;
     } else {
       let path = [];
@@ -68,7 +67,6 @@ class BFS {
       do {
         path.unshift(p);
       } while ((p = p.prev) != null);
-      console.log(`${path} ${path.length}`);
       return this.out =="length" ? path.length -1 : this;
     }
   }

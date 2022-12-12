@@ -689,12 +689,24 @@ const day1 = require('./01/day1'),
       console.time('day12');
       let inp = await rf('./12/input');
       const {map,start,end,BFS} = await day12(inp);
-      //console.log(map);
       let search = new BFS(map,"length");  
       let part1 =search.shortestPath(end, start), 
-        part2;
+        part2=0;
+      let min = Number.MAX_SAFE_INTEGER;
+      for(let y=0;y<map.length;y++){
+        for(let x=0;x<map[0].length;x++){
+          if(map[y][x]=='a'.charCodeAt(0)){
+            let s = new BFS(map,"length");
+            let z = s.shortestPath(end,[y,x]);
+            if(z<min && z>0){
+              min = z;
+            }
+          }
+        }
+      }
+      part2 = min;
       console.log("Answer for part1",part1);
-      console.log("Answer for part2: DID NOT FINISH");
+      console.log("Answer for part2", part2);
       console.timeEnd('day12');
       console.log("=============EOF Day12===========")
       return r({part1,part2})
