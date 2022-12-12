@@ -12,7 +12,8 @@ const day1 = require('./01/day1'),
   day8 = require('./08/day8'),
   day9 = require('./09/day9'),
   day10 = require('./10/day10'),
-  day11 = require('./11/day11')
+  day11 = require('./11/day11'),
+  day12 = require('./12/day12')
 
   ;
 (async ()=>{
@@ -681,6 +682,23 @@ const day1 = require('./01/day1'),
       console.log("Answer for part2:\n",part2);
       console.timeEnd('day11');
       console.log("=============EOF Day11===========")
+      return r({part1,part2})
+    })
+    await new Promise(async(r,b)=>{
+      console.log("============Start Day12==========")
+      console.time('day12');
+      let inp = await rf('./12/input');
+      const {map,start,end,BFS} = await day12(inp);
+      //console.log(map);
+      let search = new BFS(map,"length");  
+      let something = search.shortestPath(end, start);
+      console.log(something);
+      let part1, 
+        part2;
+      console.log("Answer for part1: DID NOT FINISH");
+      console.log("Answer for part2: DID NOT FINISH");
+      console.timeEnd('day12');
+      console.log("=============EOF Day12===========")
       return r({part1,part2})
     })
   })()
