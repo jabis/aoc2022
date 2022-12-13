@@ -55,7 +55,9 @@ const scanDirectories = (rootPath, targetFiles, operation) => {
 
 const rootPath = './';
 const targetFiles = ['input'];
-if(process.env.AOC_OP && process.env.AOC_KEY)
+if(process.env.AOC_OP && process.env.AOC_KEY){
+  if(op=="decrypt") targetFiles[0]='input.encrypted';
   scanDirectories(rootPath, targetFiles, op);
-else 
+} else {
   throw new Error('Key or Operation not defined');
+}
