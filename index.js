@@ -13,7 +13,8 @@ const day1 = require('./01/day1'),
   day9 = require('./09/day9'),
   day10 = require('./10/day10'),
   day11 = require('./11/day11'),
-  day12 = require('./12/day12')
+  day12 = require('./12/day12'),
+  day13 = require('./13/day13')
 
   ;
 (async ()=>{
@@ -710,5 +711,40 @@ const day1 = require('./01/day1'),
       console.timeEnd('day12');
       console.log("=============EOF Day12===========")
       return r({part1,part2})
+    })
+    await new Promise(async(r,b)=>{
+      console.log("============Start Day13==========")
+      console.time('day13');
+      let inp = await rf('./13/input');
+      let lr = await day13(inp);
+      const numarr = (a, b) => {
+        for (let i = 0, len = Math.max(a.length, b.length); i < len; i++) {
+          if (a.length <= i) return -1; if (b.length <= i) return 1;
+          let l = a[i], r = b[i];
+          if (typeof l == 'number' && typeof r == 'number') {
+              if (l !== r) return l < r ? -1 : 1;
+          } else {
+            let larr = Array.isArray(l) ? l : [l],rarr = Array.isArray(r) ? r : [r];
+            let recur = numarr(larr, rarr);
+            if (recur !== 0) return recur;
+          }
+        }
+        return 0;
+      }
+      let part1,part2,k1=[[2]],k2=[[6]];
+      part1 = lr.map((obj,idx)=>{
+        return (numarr(obj.left,obj.right)===-1) ? idx+1 : 0;
+      }).reduce((a,b)=>a+b,0);
+      let flat = lr.reduce((prev,obj)=>{
+        if(!prev) prev=[]; prev.push([obj.left,obj.right]); return prev;
+      },[]).flat();
+      flat.push(k1);
+      flat.push(k2);
+      flat.sort(numarr);
+      part2 = (1 + flat.indexOf(k1)) * (1 +flat.indexOf(k2));
+      console.log("Answer for part1",part1);
+      console.log("Answer for part2", part2);
+      console.timeEnd('day13');
+      console.log("=============EOF Day13===========")
     })
   })()
