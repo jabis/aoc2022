@@ -1,6 +1,6 @@
 const debug = false,
   printout = false,
-  fancyprint = true;
+  fancyprint = false;
 const rf = require('./rf');
 const fs = require('fs');
 const day1 = require('./01/day1'),
@@ -848,10 +848,10 @@ const day1 = require('./01/day1'),
 
       let part2Cave = [];
 
-      console.log(xm, xx, ym,yx)
+      if(debug) console.log(xm, xx, ym,yx)
       for(let oi=0;oi<yx+2;oi++){
         part2Cave[oi]=[];
-        for(let m=0;m<500;m++){
+        for(let m=0;m<xx;m++){
           part2Cave[oi][m] = cempt;
         }
       }
@@ -879,21 +879,21 @@ const day1 = require('./01/day1'),
       while (
         is2 +1 < part2Cave.length &&
         js2 < part2Cave[0].length &&
-        part2Cave[0][jns] !== csand 
+        part2Cave[0][jns2] !== csand 
       ) {
         if (part2Cave[is2 + 1][js2] === crock || part2Cave[is2 + 1][js2] === csand) {
           if (part2Cave[is2 + 1][js2 - 1] === cempt) { is2++; js2--; } 
           else if (part2Cave[is2 + 1][js2 + 1] === cempt) { is2++; js2++; } 
-          else { part2Cave[is2][js2] = csand; is2 = 0; js2 = jns; sc2++; }
+          else { part2Cave[is2][js2] = csand; is2 = 0; js2 = jns2; sc2++; }
         } else { is2++; }
         //if(sc2>5000) break;
       }
       
       let filled2 = part2Cave.reduce((p,n)=>p+n.join("")+'\n',"");
-      if(debug) console.log(filled2);
+      console.log(filled2);
       let flen2 = ''+sc2;
       flen2 = flen2.length;
-      part2 = "DID NOT FINISH";
+      part2 = sc2;
       console.log("Answer for part2", part2);
       console.timeEnd('day14');
       console.log("=============EOF Day14===========")
