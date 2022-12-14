@@ -1,5 +1,6 @@
 const debug = false,
-  printout = true;
+  printout = false,
+  fancyprint = true;
 const rf = require('./rf');
 const fs = require('fs');
 const day1 = require('./01/day1'),
@@ -686,7 +687,7 @@ const day1 = require('./01/day1'),
       console.log("=============EOF Day11===========")
       return r({part1,part2})
     })
-    await new Promise(async(r,b)=>{
+    /*await new Promise(async(r,b)=>{
       console.log("============Start Day12==========")
       console.time('day12');
       let inp = await rf('./12/input');
@@ -748,16 +749,151 @@ const day1 = require('./01/day1'),
       console.timeEnd('day13');
       console.log("=============EOF Day13===========")
       return r({part1,part2})
-    })
+    })*/
     await new Promise(async(r,b)=>{
       console.log("============Start Day14==========")
       console.time('day14');
       let inp = await rf('./14/input');
-      let fourteen = await day14(inp);
-      console.log(fourteen)
+      let coords = await day14(inp);
+      let {rocks,xm,xx,ym,yx} = coords;
+      let v0id = xm-1, voidr = xx+1;
+      const sx = 500;
+      const sy = 0;
+      let cave = {},
+        crock = "█",
+        cdrop='Δ',
+        cvoid="~",
+        cempt=".",
+        csand="o";
+      for (let y = yx,yy=0; y>=0; y--,yy++){
+        cave['r'+yy] ={}
+        for (let i = v0id,ii=0; i <= voidr; i++,ii++) {
+          cave['r'+yy]['c'+i] = (ii===0||i===voidr)?cvoid:cempt;
+        }
+      }
+      cave[`r${sy}`][`c${sx}`]=cdrop;
+      rocks.map(d=>{
+        let last = null;
+        while(d.length){
+          let from = (last) ? last : d.shift();
+          let to = d.length ? d.shift() : last;
+          last = to;
+          let [fx,fy] = from;
+          let [tx,ty] = to;
+          let lr = fy-ty===0, 
+          ud= fx-tx===0,
+          dist = lr ? tx-fx : ty-fy,
+          dir = "no"; 
+          if(lr) dir = dist > 0 ? "r" : "l";
+          else dir = dist > 0 ? "d" : "u";
+          cave[`r${fy}`][`c${fx}`] = crock;
+          cave[`r${ty}`][`c${tx}`] = crock;
+          switch(dir){
+            case "l":
+            case "u":
+            while(dist++){
+              let u= ud?fy+dist:fy;
+              let l= ud?fx:fx+dist;
+              cave[`r${u}`][`c${l}`] = crock
+              if(dist==0) break;
+            }
+            break;
+            case "d":
+            case "r":
+            while(dist--){
+              let d= ud?ty-dist:ty;
+              let r= ud?tx:tx-dist;
+              cave[`r${d}`][`c${r}`] = crock;
+              if(dist==0) break;
+            }
+            break;
+            case "no":
+            default:
+              throw new Error('Nowhere to go')
+          }
+        }
+      })
+      let sandCave = [];
+      Object.keys(cave).map((c,idx)=>{
+        let obj = cave[c];
+        let vals = Object.values(obj);
+        vals.shift(); // remove v0id left
+        vals.pop(); // remove void right
+        sandCave[idx] = vals
+      })
 
-      let part1,part2;
-      console.log("Answer for part1",part1);
+      
+      let sc = 0, is = 0, js=0,jns=sandCave[0].findIndex(c=>c==cdrop);
+      js = jns
+      while (
+        is +1 < sandCave.length &&
+        js < sandCave[0].length-1 &&
+        sandCave[1][js] !== csand 
+      ) {
+        if (sandCave[is + 1][js] === crock || sandCave[is + 1][js] === csand) {
+          if (sandCave[is + 1][js - 1] === cempt) { is++; js--; } 
+          else if (sandCave[is + 1][js + 1] === cempt) { is++; js++; } 
+          else { sandCave[is][js] = csand; is = 1; js = jns; sc++; }
+        } else { is++; }
+      }
+      let filled = sandCave.reduce((p,n)=>p+n.join("")+'\n',"");
+
+      let flen = ''+sc;
+      flen = flen.length;
+      let f1 = "♯".repeat(Math.floor(Math.floor(sandCave[0].length/2)-flen))
+      let f2 = "♯".repeat(Math.floor(Math.floor(sandCave[0].length/2)))
+      let part1 = fancyprint ? `\n\x1b[33m${filled}\x1b[0m\x1b[31m${f1}\x1b[0m\x1b[32m${sc}\x1b[0m\x1b[31m${f2}\x1b[0m` : sc,
+        part2;
+      console.log("Answer for part1 ",part1);
+
+      let part2Cave = [];
+
+      console.log(xm, xx, ym,yx)
+      for(let oi=0;oi<yx+2;oi++){
+        part2Cave[oi]=[];
+        for(let m=0;m<500;m++){
+          part2Cave[oi][m] = cempt;
+        }
+      }
+      Object.keys(cave).map((c,idx)=>{
+        let obj = cave[c];
+        let vals = Object.keys(obj);
+        for(let val of vals){
+          let data = obj[val];
+          val = Number(val.replace('c',''));
+          if(data != cvoid)
+            part2Cave[idx][val] = data;
+        }
+      })
+      let idz = part2Cave.length, vl = part2Cave[0].length;
+      part2Cave.push([]);
+      part2Cave.push([]);
+      for (var jc = 0; jc < vl; jc++) {
+        part2Cave[idz][jc] = cempt;
+        part2Cave[idz+1][jc] = crock;
+      }
+      //console.log(part2Cave)
+      let sc2 = 0, is2 = 0, js2=0,jns2=part2Cave[0].findIndex(c=>c==cdrop);
+      js2 = jns2;
+      if(debug) console.log(sc2,is2,js2,jns2);
+      while (
+        is2 +1 < part2Cave.length &&
+        js2 < part2Cave[0].length &&
+        part2Cave[0][jns] !== csand 
+      ) {
+        if (part2Cave[is2 + 1][js2] === crock || part2Cave[is2 + 1][js2] === csand) {
+          if (part2Cave[is2 + 1][js2 - 1] === cempt) { is2++; js2--; } 
+          else if (part2Cave[is2 + 1][js2 + 1] === cempt) { is2++; js2++; } 
+          else { part2Cave[is2][js2] = csand; is2 = 0; js2 = jns; sc2++; }
+        } else { is2++; }
+        //if(sc2>5000) break;
+      }
+      
+      let filled2 = part2Cave.reduce((p,n)=>p+n.join("")+'\n',"");
+      if(debug) console.log(filled2);
+      let flen2 = ''+sc2;
+      flen2 = flen2.length;
+      part2 = "DID NOT FINISH";
       console.log("Answer for part2", part2);
       console.timeEnd('day14');
       console.log("=============EOF Day14===========")
