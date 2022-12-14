@@ -14,7 +14,8 @@ const day1 = require('./01/day1'),
   day10 = require('./10/day10'),
   day11 = require('./11/day11'),
   day12 = require('./12/day12'),
-  day13 = require('./13/day13')
+  day13 = require('./13/day13'),
+  day14 = require('./14/day14')
 
   ;
 (async ()=>{
@@ -746,5 +747,20 @@ const day1 = require('./01/day1'),
       console.log("Answer for part2", part2);
       console.timeEnd('day13');
       console.log("=============EOF Day13===========")
+      return r({part1,part2})
+    })
+    await new Promise(async(r,b)=>{
+      console.log("============Start Day14==========")
+      console.time('day14');
+      let inp = await rf('./14/input');
+      let fourteen = await day14(inp);
+      console.log(fourteen)
+
+      let part1,part2;
+      console.log("Answer for part1",part1);
+      console.log("Answer for part2", part2);
+      console.timeEnd('day14');
+      console.log("=============EOF Day14===========")
+      return r({part1,part2})
     })
   })()
