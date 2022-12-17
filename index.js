@@ -1,7 +1,7 @@
 const debug = false,
   printout = false,
   fancyprint = false;
-const rf = require('./rf');
+const {rf,funcs} = require('./rf');
 const fs = require('fs');
 const day1 = require('./01/day1'),
   day2 = require('./02/day2'),
@@ -16,7 +16,9 @@ const day1 = require('./01/day1'),
   day11 = require('./11/day11'),
   day12 = require('./12/day12'),
   day13 = require('./13/day13'),
-  day14 = require('./14/day14')
+  day14 = require('./14/day14'),
+  day15 = require('./15/day15'),
+  day16 = require('./16/day16')
 
   ;
 (async ()=>{
@@ -713,7 +715,7 @@ const day1 = require('./01/day1'),
       console.timeEnd('day12');
       console.log("=============EOF Day12===========")
       return r({part1,part2})
-    })
+    })*/
     await new Promise(async(r,b)=>{
       console.log("============Start Day13==========")
       console.time('day13');
@@ -749,13 +751,13 @@ const day1 = require('./01/day1'),
       console.timeEnd('day13');
       console.log("=============EOF Day13===========")
       return r({part1,part2})
-    })*/
+    })
     await new Promise(async(r,b)=>{
       console.log("============Start Day14==========")
       console.time('day14');
       let inp = await rf('./14/input');
       let coords = await day14(inp);
-      let {rocks,xm,xx,ym,yx} = coords;
+      let {rocks,xm,xx,ym,yx,xlen} = coords;
       let v0id = xm-1, voidr = xx+1;
       const sx = 500;
       const sy = 0;
@@ -849,23 +851,29 @@ const day1 = require('./01/day1'),
       let part2Cave = [];
 
       if(debug) console.log(xm, xx, ym,yx)
-      for(let oi=0;oi<yx+2;oi++){
+      for(let oi=0;oi<yx+4;oi++){
         part2Cave[oi]=[];
-        for(let m=0;m<xx;m++){
+        for(let m=0;m<xlen*4;m++){
           part2Cave[oi][m] = cempt;
         }
       }
+      //console.log(part2Cave);
       Object.keys(cave).map((c,idx)=>{
-        let obj = cave[c];
+        /*let obj = cave[c];
         let vals = Object.keys(obj);
         for(let val of vals){
           let data = obj[val];
           val = Number(val.replace('c',''));
-          if(data != cvoid)
-            part2Cave[idx][val] = data;
-        }
+          let id = Number(c.replace('r',''))
+          part2Cave[id][val] = data;
+        }*/
+        let obj = cave[c];
+        let vals = Object.values(obj);
+        vals.shift(); // remove v0id left
+        vals.pop(); // remove void right
+        part2Cave[idx] = vals
       })
-      let idz = part2Cave.length, vl = part2Cave[0].length;
+      let idz = part2Cave.length, vl = xlen;
       part2Cave.push([]);
       part2Cave.push([]);
       for (var jc = 0; jc < vl; jc++) {
@@ -890,13 +898,186 @@ const day1 = require('./01/day1'),
       }
       
       let filled2 = part2Cave.reduce((p,n)=>p+n.join("")+'\n',"");
-      console.log(filled2);
+      //console.log(filled2);
       let flen2 = ''+sc2;
       flen2 = flen2.length;
       part2 = sc2;
       console.log("Answer for part2", part2);
       console.timeEnd('day14');
       console.log("=============EOF Day14===========")
+      return r({part1,part2})
+    })
+    await new Promise(async(r,b)=>{
+      console.log("============Start Day15==========")
+      console.time('day15');
+      let f = funcs();
+      let inp = await rf('./15/input');
+      let {signals,md,sign} = await day15(inp);
+      let testY=10,xMax=20,yMax=20;
+      const testLine = (y,xMax,yMax) => {
+        let blocked = [];
+        let beacons = new Set();
+        let positions = new Set();
+    
+        signals.forEach(([sx, sy, bx, by, d]) => {
+          if (by === y) {
+            beacons.add(bx);
+          }
+          const dx = d - Math.abs(sy - y);
+          if (dx < 0) {
+            return;
+          }
+          for (let x = sx - dx; x <= sx + dx; x++) {
+            positions.add(x);
+          }
+          blocked.push([sx - dx, sx + dx]);
+        });
+        blocked.sort();
+        let i = 0;
+        while (i < blocked.length - 1) {
+          while (
+            i < blocked.length - 1 &&
+            blocked[i][1] >= blocked[i + 1][0] - 1
+          ) {
+            blocked[i][1] = Math.max(blocked[i][1], blocked[i + 1][1]);
+            blocked.splice(i + 1, 1);
+          }
+          i += 1;
+        }
+        return {blocked, beacons, size: beacons.size, possize: positions.size}
+      };
+      let part1 = () =>{
+        let {blocked, beacons, size, possize} = testLine(testY,xMax,yMax);
+        const bc = blocked.reduce((acc, b) => acc + b[1] - b[0] + 1, 0);
+        return `${bc}`
+      }
+      const part2 = () => {
+        testY = 2000000;
+        xMax = 4000000;
+        yMax = 4000000;
+        //let {blocked, beacons, size, possize} = testLine(testY,xMax,yMax);
+        //const bc = blocked.reduce((acc, b) => acc + b[1] - b[0] + 1, 0);
+        let minx = Number.MAX_SAFE_INTEGER;
+        let miny = Number.MAX_SAFE_INTEGER;
+        let maxx = Number.MIN_SAFE_INTEGER;
+        let maxy = Number.MIN_SAFE_INTEGER;
+        for (const [sx, sy, , , d] of signals) {
+          minx = Math.min(minx, sx - d);
+          miny = Math.min(miny, sy - d);
+          maxx = Math.max(maxx, sx + d);
+          maxy = Math.max(maxy, sy + d);
+        }
+        if (minx <= 0 && 0 <= maxx) {
+          return [0, miny];
+        }
+        if (miny <= 0 && 0 <= maxy) {
+          return [minx, 0];
+        }
+        if (minx <= xMax && xMax <= maxx) {
+          return [xMax, miny];
+        }
+        if (miny <= yMax && yMax <= maxy) {
+          return [minx, yMax];
+        }
+      };
+
+      console.log("Answer for part1: DID NOT FINISH", /* part1() something wrong with the logic */);      
+      console.log("Answer for part2: DID NOT FINISH", /* part2() ends up with range error*/ );
+      console.timeEnd('day15');
+      console.log("=============EOF Day15===========")
+      return r({part1,part2})
+    })
+    await new Promise(async(r,b)=>{
+      console.log("============Start Day16==========")
+      console.time('day16');
+      let f = funcs();
+     
+      let inp = await rf('./16/testinput'),part1,part2;
+
+      let {valves,dijOE,diJOE2,diJOE3,diJOE4} = await day16(inp);
+      let graph = new Map();
+      valves.map(v=>{
+        let paths = []
+        v.paths.map(n=>{
+          let vl = valves.find(c=>c.valve===n);
+          paths.push([vl.valve, vl.rate]);
+        })
+        graph.set(v.valve,paths);
+      })
+      //console.log(graph);
+      let g = dijOE(graph,"AA");
+      //console.log(g);
+      let aa =diJOE2(graph); 
+      let ab =diJOE3(graph); 
+      //let ac =diJOE4(graph); 
+      /*let ab= diJOE2(graph,"DD");
+      let ac= diJOE2(graph,"II");
+      let ad= diJOE2(graph,"BB");*/
+      console.log(aa);
+      /*
+      /*let first = 'AA', costOpen=1, costMove=1,timeLeft=30;
+      let peeked = new Map();
+      let visited = new Map();
+      let calculated = new Set();
+      let releasing = new Set();
+      let totals = 0;
+      let peek = (curr,prev,idx=0)=>{
+        while(timeLeft>0){
+          console.log("visiting",curr, timeLeft);
+          visited.set(curr.valve,curr);
+          if(curr != prev && prev) {
+            valves[prev.idx].exhausted.push(curr.valve);
+            console.log("prev is ", valves[prev.idx]);
+          }
+          let coeff = new Set();
+          if(idx>0 || curr.status != "open" || curr.status != "broken"){
+            timeLeft-=costMove;
+          } 
+          let cr = curr.rate, cn=curr.valve,cs=curr.status;
+          curr.paths.map(n=>{
+            let next = valves.find(v=>v.valve===n);
+            if(next.rate !=0){
+              coeff.add([next.valve,next.rate,next.status]);
+            }
+            peeked.set(n,next);
+            
+          })
+          let [nextvalve,rate] = Array.from(coeff.values()).reduce((p,v)=>{
+            if(p[1]>=v[1] && p[2] != "open"){
+              //console.log("valid?",curr.status)
+              return [p[0],p[1],p[2]];
+            }
+            else {
+              return [v[0],v[1],v[2]];
+            }
+          },[cn,cr,cs])
+          //console.log(nextvalve,rate,totals);
+          //console.log(coeff,peeked,visited);
+          if(nextvalve == cn){
+            if(curr.status == "open" && curr.exhausted.length == curr.paths.length) {
+              break;
+            }
+            curr.status = 'open';
+            valves[curr.idx] = curr;
+            timeLeft-=costOpen;
+            console.log("opening",curr.valve,"timeLeft",timeLeft);
+            totals += curr.rate * timeLeft;
+            console.log("totals",totals)
+            calculated.add(curr);
+            releasing.add([cn,cr])
+            return peek(valves.find(v=>v.valve===nextvalve),curr,idx++);
+          } else {
+            return peek(valves.find(v=>v.valve===nextvalve),curr,idx++);
+          }
+          
+        }
+      }
+      peek(valves.find(v=>v.valve===first),0) */
+      //console.log(valves);
+      console.log("Answer for part1:",part1, /* part1() something wrong with the logic */);      
+      console.log("Answer for part2:",part2, /* part2() ends up with range error*/ );
+      console.timeEnd('day16');
+      console.log("=============EOF Day16===========")
       return r({part1,part2})
     })
   })()
