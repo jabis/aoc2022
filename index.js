@@ -1085,8 +1085,31 @@ const day1 = require('./01/day1'),
       console.log("============Start Day1==========")
       console.time('day17');
       let i = await rf('./17/testinput');
-      let {moves,blocks} = await day17(i);
-      console.log(moves,blocks);
+      let f = funcs();
+      let {moves,blocks,chars,blockmax} = await day17(i);
+      console.log(moves,blocks,chars,blockmax);
+      let c = chars;
+      let chamber = [], h = blockmax+2, w=7;
+      let fill = (arr,all=1,first=0)=>{
+        let newrow = newrow()
+        for(let x=1;x<newrow.length()-1;x++){
+          if(arr.length == 1 && all == 1) newrow[x] = arr[0]
+          else newrow[x] = arr[x-1];
+        }
+        chamber.unshift(newrow)
+      }
+      let newrow = ()=>{
+        let arr = new Array({length:w}).fill(c['nil'])
+        arr.unshift(c['wl']);
+        arr.push(c['wr']);
+        return arr;
+      }
+      fill(c['floor'],1,1);
+      console.log(chamber);
+      let cnt = 2022;
+      let fn = (i) => {
+
+      }
       console.log("Answer for part1:",part1, /* part1() something wrong with the logic */);      
       console.log("Answer for part2:",part2, /* part2() ends up with range error*/ );
       console.timeEnd('day16');
