@@ -18,7 +18,8 @@ const day1 = require('./01/day1'),
   day13 = require('./13/day13'),
   day14 = require('./14/day14'),
   day15 = require('./15/day15'),
-  day16 = require('./16/day16')
+  day16 = require('./16/day16'),
+  day17 = require('./17/day17')
 
   ;
 (async ()=>{
@@ -1074,6 +1075,18 @@ const day1 = require('./01/day1'),
       }
       peek(valves.find(v=>v.valve===first),0) */
       //console.log(valves);
+      console.log("Answer for part1:",part1, /* part1() something wrong with the logic */);      
+      console.log("Answer for part2:",part2, /* part2() ends up with range error*/ );
+      console.timeEnd('day16');
+      console.log("=============EOF Day16===========")
+      return r({part1,part2})
+    })
+    await new Promise(async(r,b)=>{
+      console.log("============Start Day1==========")
+      console.time('day17');
+      let i = await rf('./17/testinput');
+      let {moves,blocks} = await day17(i);
+      console.log(moves,blocks);
       console.log("Answer for part1:",part1, /* part1() something wrong with the logic */);      
       console.log("Answer for part2:",part2, /* part2() ends up with range error*/ );
       console.timeEnd('day16');
