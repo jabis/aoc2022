@@ -1246,4 +1246,53 @@ const day1 = require('./01/day1'),
       console.log("=============EOF Day17===========")
       return r({part1,part2})
     })
+    await new Promise(async(r,b)=>{
+      console.log("============Start Day18==========")
+      console.time('day18');
+      let i = await rf('./18/testinput');
+      let f = funcs();
+      let prse = await day18(i);
+      console.log(prse);
+      function calculateSurfaceArea(grid, size) {
+        // Initialize surface area to 0
+        let surfaceArea = 0;
+      
+        // Convert grid integer to binary string
+        const gridBinary = grid.toString(2);
+      
+        // Loop through each bit in the gridBinary string
+        for (let i = 0; i < gridBinary.length; i++) {
+          // Initialize exposedSides to 0
+          let exposedSides = 0;
+      
+          // Check if corresponding bit in gridBinary is set to 1
+          if (gridBinary[i] === "1") {
+            // Calculate x, y, and z coordinates for current cube
+            const x = i % size.width;
+            const y = Math.floor(i / size.width) % size.height;
+            const z = Math.floor(i / (size.width * size.height));
+      
+            // Check if neighboring cubes exist in each direction
+            if (x === 0 || !(grid & (1 << (i - 1)))) exposedSides |= 1; // left
+            if (x === size.width - 1 || !(grid & (1 << (i + 1)))) exposedSides |= 2; // right
+            if (y === 0 || !(grid & (1 << (i - size.width)))) exposedSides |= 4; // up
+            if (y === size.height - 1 || !(grid & (1 << (i + size.width)))) exposedSides |= 8; // down
+            if (z === 0 || !(grid & (1 << (i - size.width * size.height)))) exposedSides |= 16; // forward
+            if (z === size.depth - 1 || !(grid & (1 << (i + size.width * size.height)))) exposedSides |= 32; // backward
+      
+            // Add exposedSides to surfaceArea
+            surfaceArea += exposedSides;
+          }
+        }
+      
+        // Return surface area
+        return surfaceArea;
+      }
+      let part1,part2;
+      console.log("Answer for part1:",part1, /* part1() something wrong with the logic */);      
+      console.log("Answer for part2:",part2, /* part2() ends up with range error*/ );
+      console.timeEnd('day18');
+      console.log("=============EOF Day18===========")
+      return r({part1,part2})
+    })
   })()

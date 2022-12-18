@@ -1,4 +1,4 @@
-const day16 = async (i) => {
+const day17 = async (i) => {
     i = i.replace(/\r\n/g, '\n');
     //i = i.split('\n');
     //console.log(i);
@@ -73,4 +73,4 @@ const day16 = async (i) => {
     })
     return {moves,blocks,chars,blockmax};
   };
-  module.exports = day16;
+  module.exports = day17;
