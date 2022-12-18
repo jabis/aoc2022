@@ -1082,38 +1082,168 @@ const day1 = require('./01/day1'),
       return r({part1,part2})
     })
     await new Promise(async(r,b)=>{
-      console.log("============Start Day1==========")
+      console.log("============Start Day17==========")
       console.time('day17');
       let i = await rf('./17/testinput');
       let f = funcs();
       let {moves,blocks,chars,blockmax} = await day17(i);
-      console.log(moves,blocks,chars,blockmax);
+      //console.log(moves,blocks,chars,blockmax);
       let c = chars;
-      let chamber = [], h = blockmax+2, w=7;
-      let fill = (arr,all=1,first=0)=>{
-        let newrow = newrow()
-        for(let x=1;x<newrow.length()-1;x++){
-          if(arr.length == 1 && all == 1) newrow[x] = arr[0]
-          else newrow[x] = arr[x-1];
-        }
-        chamber.unshift(newrow)
+      let state ={
+        currblock:null,
+        chamber:[]
       }
+      let chamber = state.chamber, 
+        h = blockmax+2, 
+        w=7;
+
       let newrow = ()=>{
-        let arr = new Array({length:w}).fill(c['nil'])
-        arr.unshift(c['wl']);
-        arr.push(c['wr']);
+        let arr = [];
+        for(let x=0;x<w;x++) arr.push(c['nil'])
         return arr;
       }
-      fill(c['floor'],1,1);
-      console.log(chamber);
-      let cnt = 2022;
-      let fn = (i) => {
-
+      let fill = (arr,all=1)=>{
+        let nr = newrow();
+        for(let x=0;x<nr.length;x++){
+          if(arr.length == 1 && all == 1) nr[x]= arr[0]
+          else nr[x] = arr[x-1];
+        }
+        chamber.unshift(nr.flat())
       }
+      
+      let rot = (block)=>{
+        const N = block.length - 1;
+        const result = block.map((row, i) =>
+          row.map((val, j) => block[N - j][i])
+        );
+        return result;
+      }
+      let isValid=(cellRow, cellCol)=>{
+        let cb =getBlock()
+        for (let row = 0; row < cb.block.length; row++) {
+          for (let col = 0; col < cb.block[row].length; col++) {
+            //console.log("chamber[cellRow + row][cellCol + col]",chamber[cellRow + row][cellCol + col]);
+            if (cb.block[row][col] && (
+                cellCol + col < 0 ||
+                cellCol + col >= chamber[0].length ||
+                cellRow + row >= chamber.length ||
+                chamber[cellRow + row][cellCol + col])
+              ) {
+              return false;
+            }
+          }
+        }
+        return true;
+      }
+      
+      
+      //fill([c['floor']],1);
+      for(let x=0;x<10;x++) fill([c['nil']],1);
+      //console.log(chamber);
+      
+      function getBlock(){
+        if(state.currblock===null) {
+          let next = blocks.shift()
+          state.currblock = next.shift();
+        }
+        return state.currblock;
+      }
+      function getNext() {
+        let last = getBlock();
+        //console.log("last",last);
+        blocks.push([last]);
+        console.log(blocks);
+        state.currblock = null;
+
+        const block = getBlock();
+        const matrix = block.block;
+        //const col = chamber[0].length / 2 - Math.ceil(matrix[0].length / 2);
+        let col = 2;
+        //console.log(col-)
+        const row = block.row;
+        block.col = col;
+        state.currblock = block;
+        return block;
+      }
+      function placeBlock() {
+        let cb = getBlock();
+        let blen = cb.block.length;
+        for (let row = 0; row < blen; row++) {
+          let rlen = cb.block[row].length;
+          for (let col = 0; col < rlen; col++) {
+            if (cb.block[row][col]) {     
+              if (cb.row + row < 0) {
+                console.log("Chamber height needs to grow",chamber.length, cb.row + row );
+                fill([c['nil']],1)
+                fill([c['nil']],1)
+                fill([c['nil']],1)
+                fill([c['nil']],1)
+                fill([c['nil']],1)
+
+              }
+              chamber[cb.row + row][cb.col + col] = cb.piece;
+            }
+          }
+        }
+      
+        // check for line clears starting from the bottom and working our way up
+        for (let row = chamber.length - 1; row >= 0; ) {
+          if (chamber[row].every(cell=>cell!=c['nil'])) {
+            for (let r = row; r >= 1; r--) {
+              for (let c = 0; c < chamber[r].length; c++) {
+                //console.log(chamber[r], r-1)
+                chamber[r][c] = chamber[r-1][c];
+              }
+            }
+          }
+          else {
+            row--;
+          }
+        }
+      
+        cb =getNext();
+      }
+      let cnt = 2022;
+      function move(m) {
+        let cb = getBlock();
+        console.log("Moving ",cb.piece);
+        lr = m == ">" ? 1 : m=="<" ? -1 : 0;
+        //console.log("moving ",cb,m,cb.row,cb.col,lr);
+        if(lr===0){
+          const row = cb.row + 1;
+
+          if(!isValid(row,cb.col)){
+            console.log("placing",cb);
+            cb.row = row - 1;
+            state.currblock = cb;
+            placeBlock()
+            return;
+          } 
+            
+          cb.row = row;
+          state.currblock = cb;
+        } else {
+          if(isValid(cb.row,cb.col)){
+            cb.col = cb.col + lr;
+            //console.log(cb.col);
+            state.currblock = cb;
+          }
+          //moves.push(m)
+        }
+        //console.log(m);
+        
+      }
+      while(cnt--){
+        let movedir = moves.shift();
+        move(movedir);
+        move("d");
+      }
+      console.log(chamber.map(r=>{ return r }).join('\n'));
+      let part1,part2;
       console.log("Answer for part1:",part1, /* part1() something wrong with the logic */);      
       console.log("Answer for part2:",part2, /* part2() ends up with range error*/ );
-      console.timeEnd('day16');
-      console.log("=============EOF Day16===========")
+      console.timeEnd('day17');
+      console.log("=============EOF Day17===========")
       return r({part1,part2})
     })
   })()
