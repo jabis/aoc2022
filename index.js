@@ -21,7 +21,8 @@ const day1 = require('./01/day1'),
   day16 = require('./16/day16'),
   day17 = require('./17/day17'),
   day18 = require('./18/day18'),
-  day19 = require('./19/day19')
+  day19 = require('./19/day19'),
+  day20 = require('./20/day20')
   ;
 (async ()=>{
   await new Promise(async(r,b)=>{
@@ -1259,7 +1260,7 @@ const day1 = require('./01/day1'),
       let grid = new Array(xMax + 1).fill(0).map(() => new Array(yMax + 1).fill(0).map(() => new Array(zMax + 1).fill(false)));
       let vis = new Array(xMax + 1).fill(0).map(() => new Array(yMax + 1).fill(0).map(() => new Array(zMax + 1).fill(false)));      
       let vissed = 0;
-      function dfs(g, v, x, y, z) {
+      let dfs = (g, v, x, y, z)=>{
         if (x < 0 || x > xMax || y < 0 || y > yMax || z < 0 || z > zMax || !g[x][y][z] || v[x][y][z]) return;
         v[x][y][z] = true;
         vissed++;
@@ -1270,15 +1271,11 @@ const day1 = require('./01/day1'),
         dfs(g,v,x, y, z - 1); // forward
         dfs(g,v,x, y, z + 1); // backward
       }
-      
-
-      function calc3d(g,v,c) {
-          
+      let calc3d = (g,v,c)=>{
         for (const [x, y, z] of c) {
           grid[x][y][z] = true;
         }
-        let area = 0,
-          pariah = 0;
+        let area = 0, pariah = 0;
           for (let x = 0; x <= xMax; x++) {
             for (let y = 0; y <= yMax; y++) {
               for (let z = 0; z <= zMax; z++) {
@@ -1304,7 +1301,7 @@ const day1 = require('./01/day1'),
       dfs(grid,vis,0,0,0)
       ; 
       //dfs(grid,vis,0,0,0);
-      let part2= vis.map(z=>z.map(y=>y.filter(x=>x).flat()).flat()).flat();
+      let part2= vis;
       
       console.log("Answer for part1:",part1);      
       console.log("Answer for part2:",part2);
@@ -1323,6 +1320,48 @@ const day1 = require('./01/day1'),
       console.log("Answer for part2:",part2);
       console.timeEnd('day19');
       console.log("=============EOF Day19===========")
+      return r({part1,part2})
+    })
+    await new Promise(async(r,b)=>{
+      console.log("============Start Day20==========")
+      console.time('day20');
+      let i = await rf('./20/input');
+      let bags = await day20(i);
+      let mix = (bag, cnt)=>{
+        bag = bag.map(v => ({ v: v }))
+        let cp = [...bag]
+        for (let c = 0; c < cnt; c++) {
+          for (let b of cp) {
+            let idx = bag.indexOf(b), old = bag.splice(idx, 1).shift(),
+              pos = idx + b.v, len = bag.length;
+            if (pos < 0) pos += len * Math.abs(Math.floor(pos / len));
+            if (pos >= len) pos = pos % len;
+            bag.splice(pos, 0, old)
+          }
+        }
+        return bag.map(v => v.v)
+      }
+      let collect = (bag) => {
+        let i = bag.indexOf(0), len=bag.length;
+        return [
+          bag[(1000 + i) % len],
+          bag[(2000 + i) % len],
+          bag[(3000 + i) % len]
+        ].reduce((p, v) => p + v, 0)
+      }
+      let part1 = (bags) => {
+        let bag = mix(bags, 1)
+        return collect(bag);
+      }
+      let part2 = (bags) => {
+        bags = bags.map(x => x * 811589153)
+        let bag = mix(bags, 10)
+        return collect(bag);
+      }
+      console.log("Answer for part1:",part1([...bags]));      
+      console.log("Answer for part2:",part2([...bags]));
+      console.timeEnd('day20');
+      console.log("=============EOF Day20===========")
       return r({part1,part2})
     })
   })()
