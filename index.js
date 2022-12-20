@@ -19,8 +19,9 @@ const day1 = require('./01/day1'),
   day14 = require('./14/day14'),
   day15 = require('./15/day15'),
   day16 = require('./16/day16'),
-  day17 = require('./17/day17')
-
+  day17 = require('./17/day17'),
+  day18 = require('./18/day18'),
+  day19 = require('./19/day19')
   ;
 (async ()=>{
   await new Promise(async(r,b)=>{
@@ -1152,7 +1153,7 @@ const day1 = require('./01/day1'),
         let last = getBlock();
         //console.log("last",last);
         blocks.push([last]);
-        console.log(blocks);
+        //console.log(blocks);
         state.currblock = null;
 
         const block = getBlock();
@@ -1173,7 +1174,7 @@ const day1 = require('./01/day1'),
           for (let col = 0; col < rlen; col++) {
             if (cb.block[row][col]) {     
               if (cb.row + row < 0) {
-                console.log("Chamber height needs to grow",chamber.length, cb.row + row );
+                //console.log("Chamber height needs to grow",chamber.length, cb.row + row );
                 fill([c['nil']],1)
                 fill([c['nil']],1)
                 fill([c['nil']],1)
@@ -1206,14 +1207,14 @@ const day1 = require('./01/day1'),
       let cnt = 2022;
       function move(m) {
         let cb = getBlock();
-        console.log("Moving ",cb.piece);
+        //console.log("Moving ",cb.piece);
         lr = m == ">" ? 1 : m=="<" ? -1 : 0;
         //console.log("moving ",cb,m,cb.row,cb.col,lr);
         if(lr===0){
           const row = cb.row + 1;
 
           if(!isValid(row,cb.col)){
-            console.log("placing",cb);
+            //console.log("placing",cb);
             cb.row = row - 1;
             state.currblock = cb;
             placeBlock()
@@ -1238,7 +1239,7 @@ const day1 = require('./01/day1'),
         move(movedir);
         move("d");
       }
-      console.log(chamber.map(r=>{ return r }).join('\n'));
+      //console.log(chamber.map(r=>{ return r }).join('\n'));
       let part1,part2;
       console.log("Answer for part1:",part1, /* part1() something wrong with the logic */);      
       console.log("Answer for part2:",part2, /* part2() ends up with range error*/ );
@@ -1251,48 +1252,77 @@ const day1 = require('./01/day1'),
       console.time('day18');
       let i = await rf('./18/testinput');
       let f = funcs();
-      let prse = await day18(i);
-      console.log(prse);
-      function calculateSurfaceArea(grid, size) {
-        // Initialize surface area to 0
-        let surfaceArea = 0;
-      
-        // Convert grid integer to binary string
-        const gridBinary = grid.toString(2);
-      
-        // Loop through each bit in the gridBinary string
-        for (let i = 0; i < gridBinary.length; i++) {
-          // Initialize exposedSides to 0
-          let exposedSides = 0;
-      
-          // Check if corresponding bit in gridBinary is set to 1
-          if (gridBinary[i] === "1") {
-            // Calculate x, y, and z coordinates for current cube
-            const x = i % size.width;
-            const y = Math.floor(i / size.width) % size.height;
-            const z = Math.floor(i / (size.width * size.height));
-      
-            // Check if neighboring cubes exist in each direction
-            if (x === 0 || !(grid & (1 << (i - 1)))) exposedSides |= 1; // left
-            if (x === size.width - 1 || !(grid & (1 << (i + 1)))) exposedSides |= 2; // right
-            if (y === 0 || !(grid & (1 << (i - size.width)))) exposedSides |= 4; // up
-            if (y === size.height - 1 || !(grid & (1 << (i + size.width)))) exposedSides |= 8; // down
-            if (z === 0 || !(grid & (1 << (i - size.width * size.height)))) exposedSides |= 16; // forward
-            if (z === size.depth - 1 || !(grid & (1 << (i + size.width * size.height)))) exposedSides |= 32; // backward
-      
-            // Add exposedSides to surfaceArea
-            surfaceArea += exposedSides;
-          }
-        }
-      
-        // Return surface area
-        return surfaceArea;
+      let coords = await day18(i);
+      const xMax = Math.max(...coords.map(coords => coords[0]));
+      const yMax = Math.max(...coords.map(coords => coords[1]));
+      const zMax = Math.max(...coords.map(coords => coords[2]));
+      let grid = new Array(xMax + 1).fill(0).map(() => new Array(yMax + 1).fill(0).map(() => new Array(zMax + 1).fill(false)));
+      let vis = new Array(xMax + 1).fill(0).map(() => new Array(yMax + 1).fill(0).map(() => new Array(zMax + 1).fill(false)));      
+      let vissed = 0;
+      function dfs(g, v, x, y, z) {
+        if (x < 0 || x > xMax || y < 0 || y > yMax || z < 0 || z > zMax || !g[x][y][z] || v[x][y][z]) return;
+        v[x][y][z] = true;
+        vissed++;
+        dfs(g,v,x - 1, y, z); // left
+        dfs(g,v,x + 1, y, z); // right
+        dfs(g,v,x, y - 1, z); // up
+        dfs(g,v,x, y + 1, z); // down
+        dfs(g,v,x, y, z - 1); // forward
+        dfs(g,v,x, y, z + 1); // backward
       }
-      let part1,part2;
-      console.log("Answer for part1:",part1, /* part1() something wrong with the logic */);      
-      console.log("Answer for part2:",part2, /* part2() ends up with range error*/ );
+      
+
+      function calc3d(g,v,c) {
+          
+        for (const [x, y, z] of c) {
+          grid[x][y][z] = true;
+        }
+        let area = 0,
+          pariah = 0;
+          for (let x = 0; x <= xMax; x++) {
+            for (let y = 0; y <= yMax; y++) {
+              for (let z = 0; z <= zMax; z++) {
+                if (g[x][y][z]) {
+                  dfs(g,v,x,y,z); 
+                  if (x === 0 || !grid[x - 1][y][z]) area++; 
+                  if (x === xMax || !grid[x + 1][y][z]) area++; 
+                  if (y === 0 || !grid[x][y - 1][z]) area++;  
+                  if (y === yMax || !grid[x][y + 1][z]) area++; 
+                  if (z === 0 || !grid[x][y][z - 1]) area++; 
+                  if (z === zMax || !grid[x][y][z + 1]) area++;
+                  //
+                }
+              }
+            }
+          }
+        return area;
+      }
+      
+      //console.log(vis,vissed)
+
+      let part1= calc3d(grid,vis,coords);
+      dfs(grid,vis,0,0,0)
+      ; 
+      //dfs(grid,vis,0,0,0);
+      let part2= vis.map(z=>z.map(y=>y.filter(x=>x).flat()).flat()).flat();
+      
+      console.log("Answer for part1:",part1);      
+      console.log("Answer for part2:",part2);
       console.timeEnd('day18');
       console.log("=============EOF Day18===========")
+      return r({part1,part2})
+    })
+    await new Promise(async(r,b)=>{
+      console.log("============Start Day19==========")
+      console.time('day19');
+      let i = await rf('./19/input');
+      let f = funcs(),part1,part2;
+      let robos = await day19(i);
+      //console.log(robos);
+      console.log("Answer for part1:",part1);      
+      console.log("Answer for part2:",part2);
+      console.timeEnd('day19');
+      console.log("=============EOF Day19===========")
       return r({part1,part2})
     })
   })()
