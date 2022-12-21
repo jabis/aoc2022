@@ -1,18 +1,27 @@
 const crs = require('fs').createReadStream;
 const rf = async(i,enc="utf-8")=>{ return new Promise((r,b)=>{ let d = '', f = crs(i,enc); f.on('data',(c)=>{d+=c}); f.on('end',()=>{return r(d)}); f.on('error',b);}) }
 class PriorityQueue {
-  constructor() {
-    this.elements = [];
+  constructor(sortfn) {
+    this.heap = [];
+    this.sortfn = typeof sortfn === "function" ? sortfn : (a,b)=>{a.priority-b.priority};
   }
-  enqueue(element, priority) {
-    this.elements.push({element, priority});
-    this.elements.sort((a, b) => a.priority - b.priority);
+  enqueue(value, priority) {
+    this.heap.push({value, priority});
+    this.heap.sort(this.sortfn);
+  }
+  size() {
+    return this.heap.length;
   }
   dequeue() {
-    return this.elements.shift().element;
+    return this.heap.shift().value;
   }
   isEmpty() {
-    return this.elements.length === 0;
+    return this.size() === 0;
+  }
+  swap(index1, index2) {
+    const temp = this.heap[index1];
+    this.heap[index1] = this.heap[index2];
+    this.heap[index2] = temp;
   }
 }
 

@@ -22,7 +22,8 @@ const day1 = require('./01/day1'),
   day17 = require('./17/day17'),
   day18 = require('./18/day18'),
   day19 = require('./19/day19'),
-  day20 = require('./20/day20')
+  day20 = require('./20/day20'),
+  day21 = require('./21/day21')
   ;
 (async ()=>{
   await new Promise(async(r,b)=>{
@@ -1364,4 +1365,27 @@ const day1 = require('./01/day1'),
       console.log("=============EOF Day20===========")
       return r({part1,part2})
     })
+    await new Promise(async(r,b)=>{
+      console.log("============Start Day21==========")
+      console.time('day21');
+      let input = await rf('./21/input');
+      let {i,rootName,solve} = await day21(input);
+      let part1 = solve(i,rootName),
+        part2=0,
+        solveLinearEquation = (b, a, y)=>{
+          return (y - b) / a;
+        };
+      part2 =0;
+      while(part2<Number.MAX_VALUE){
+        part2 += 0.5;
+        console.log(solveLinearEquation(1,part2,150),part2)
+        if(solve(i,rootName,part2)) break;
+      }
+      console.log("Answer for part1:",part1);      
+      console.log("Answer for part2:",part2);
+      console.timeEnd('day21');
+      console.log("=============EOF Day21===========")
+      return r({part1,part2})
+    })
+    
   })()
