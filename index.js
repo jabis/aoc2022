@@ -1,6 +1,6 @@
 const debug = false,
   printout = false,
-  fancyprint = false;
+  fancyprint = true;
 const {rf,funcs} = require('./rf');
 const fs = require('fs');
 const day1 = require('./01/day1'),
@@ -23,7 +23,8 @@ const day1 = require('./01/day1'),
   day18 = require('./18/day18'),
   day19 = require('./19/day19'),
   day20 = require('./20/day20'),
-  day21 = require('./21/day21')
+  day21 = require('./21/day21'),
+  day22 = require('./22/day22')
   ;
 (async ()=>{
   await new Promise(async(r,b)=>{
@@ -1368,7 +1369,7 @@ const day1 = require('./01/day1'),
     await new Promise(async(r,b)=>{
       console.log("============Start Day21==========")
       console.time('day21');
-      let input = await rf('./21/input');
+      let input = await rf('./21/testinput');
       let {i,rootName,solve} = await day21(input);
       let part1 = solve(i,rootName),
         part2=0,
@@ -1378,7 +1379,7 @@ const day1 = require('./01/day1'),
       part2 =0;
       while(part2<Number.MAX_VALUE){
         part2 += 0.5;
-        console.log(solveLinearEquation(1,part2,150),part2)
+        //console.log(solveLinearEquation(1,part2,150),part2)
         if(solve(i,rootName,part2)) break;
       }
       console.log("Answer for part1:",part1);      
@@ -1387,5 +1388,18 @@ const day1 = require('./01/day1'),
       console.log("=============EOF Day21===========")
       return r({part1,part2})
     })
-    
+    await new Promise(async(r,b)=>{
+      console.log("============Start Day22==========")
+      console.time('day22');
+      let input = await rf('./22/input'),part1,part2;
+      let state = await day22(input,debug,fancyprint),
+        game = state();      
+      game = game.movnturn();
+      if(fancyprint) console.log(game.print());
+      console.log("Answer for part1:",game.part1);      
+      console.log("Answer for part2:",part2);
+      console.timeEnd('day22');
+      console.log("=============EOF Day22===========")
+      return r({part1,part2})
+    })
   })()
