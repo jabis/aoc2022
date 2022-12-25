@@ -1,4 +1,4 @@
-const {funcs}=require('./../rf');
+const {funcs,chars,dirs}=require('./../rf');
 f = funcs();
 const day22 = async (i, debug, fancy) => {
   i = i.replace(/\r\n/g, '\n');
@@ -9,28 +9,6 @@ const day22 = async (i, debug, fancy) => {
     firstX=0,
     firstY=0,
     firstF;
-  let chars = {
-    ' ':"void",
-    '.':"empty",
-    "#":"block",
-    "◄":"left",
-    "►":"right",
-    "▼":"down",
-    "▲":"up",
-    "block":"█",
-    "empty":" ",
-    "void":"░",
-    "left":"◄",
-    "right":"►",
-    "down":"▼",
-    "up":"▲"
-  },
-  dirs = {
-    right: [1, 0],
-    down: [0, 1],
-    left: [-1, 0],
-    up: [0, -1],
-  };
   firstF = dirs["right"];
   let rowceil = new Map();
   let rowfloor = new Map();
@@ -220,9 +198,9 @@ const day22 = async (i, debug, fancy) => {
         let i=0;
         a: while(i<steps){
           i++;
+          let old = curr;
           let check = g.check(curr,face);
           let isvoid = g.checkVoid(curr,face);
-          let old = curr;
           if(debug) console.log("is it void or border?",isvoid,"going",dir);
           if(isvoid){
             aa: switch(dir){
@@ -233,7 +211,7 @@ const day22 = async (i, debug, fancy) => {
                 check = g.check(curr,face);
               break aa;
               case "left":
-                let lx = g.lastcol.get(''+y);
+                let lx = g.lastcol.get(''+y)+1;
                 curr=[lx,y];
                 check = g.check(curr,face);
               break aa;
@@ -254,7 +232,7 @@ const day22 = async (i, debug, fancy) => {
                 }
                 if(dcol!=null){
                   if(debug) console.log("dcol is",dcol);
-                  //y = g.pos.y = dcol;
+                  //y = g.pos.y = dcol-1;
                   curr = [x,dcol-1]
                   //console.log(curr);
                 } else {
@@ -264,7 +242,7 @@ const day22 = async (i, debug, fancy) => {
                 check = g.check(curr,face);
                 if(!check){
                   curr = old;
-                  y = g.pos.y =  old[1];
+                  y = g.pos.y = old[1];
                   i = steps;
                   dcol = null;
                   //check = false;
@@ -289,6 +267,7 @@ const day22 = async (i, debug, fancy) => {
                 }
                 if(ucol!=null){
                   if(debug) console.log("ucol is",ucol);
+                  //y = g.pos.y = ucol+1;
                   curr = [x,ucol+1]
                   if(debug) console.log(curr);
                   } else {
@@ -311,6 +290,7 @@ const day22 = async (i, debug, fancy) => {
           if(!check) {
             if(debug) console.log("stopping")
             i = steps;
+            curr = old;
             break a;
           }
           curr = g.visit(curr,face)

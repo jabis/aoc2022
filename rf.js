@@ -24,6 +24,36 @@ class PriorityQueue {
     this.heap[index2] = temp;
   }
 }
+let chars = {
+  ' ':"void",
+  '.':"empty",
+  "#":"block",
+  "◄":"left",
+  "►":"right",
+  "▼":"down",
+  "▲":"up",
+  "block":"█",
+  "empty":" ",
+  "void":"░",
+  "left":"◄",
+  "right":"►",
+  "down":"▼",
+  "up":"▲"
+},
+dirs = {
+  right: [1, 0],
+  e: [1, 0],
+  down: [0, 1],
+  s: [0, 1],
+  left: [-1, 0],
+  w: [-1, 0],
+  up: [0, -1],
+  n: [0, -1],
+  ne: [-1,-1],
+  nw: [1, -1],
+  se: [1, -1],
+  sw: [1, 1]
+};
 
 let funcs = ()=>{
     let splat =  (arr) =>{
@@ -132,4 +162,4 @@ let funcs = ()=>{
     toPath
   }
 }
-module.exports = {rf,funcs,PriorityQueue};
+module.exports = {rf,funcs,PriorityQueue,chars,dirs};

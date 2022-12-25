@@ -24,7 +24,10 @@ const day1 = require('./01/day1'),
   day19 = require('./19/day19'),
   day20 = require('./20/day20'),
   day21 = require('./21/day21'),
-  day22 = require('./22/day22')
+  day22 = require('./22/day22'),
+  day23 = require('./23/day23'),
+  day24 = require('./24/day24'),
+  day25 = require('./25/day25')
   ;
 (async ()=>{
   await new Promise(async(r,b)=>{
@@ -1327,7 +1330,7 @@ const day1 = require('./01/day1'),
     await new Promise(async(r,b)=>{
       console.log("============Start Day20==========")
       console.time('day20');
-      let i = await rf('./20/input');
+      let i = await rf('./20/testinput');
       let bags = await day20(i);
       let mix = (bag, cnt)=>{
         bag = bag.map(v => ({ v: v }))
@@ -1400,6 +1403,48 @@ const day1 = require('./01/day1'),
       console.log("Answer for part2:",part2);
       console.timeEnd('day22');
       console.log("=============EOF Day22===========")
+      return r({part1,part2})
+    })
+    await new Promise(async(r,b)=>{
+      console.log("============Start Day23==========")
+      console.time('day23');
+      let input = await rf('./23/testinput'),part1,part2;
+      let f = funcs();
+      let {chars,dirs} = require('./rf');
+      let elves = await day23(input,debug,fancyprint);
+      
+      //console.log(elves.game);
+      console.log("Answer for part1:",part1);      
+      console.log("Answer for part2:",part2);
+      console.timeEnd('day23');
+      console.log("=============EOF Day23===========")
+      return r({part1,part2})
+    })
+    await new Promise(async(r,b)=>{
+      console.log("============Start Day24==========")
+      console.time('day24');
+      let input = await rf('./24/testinput'),part1,part2;
+      let f = funcs();
+      let {chars,dirs} = require('./rf');
+      let blizzard = await day24(input,debug,fancyprint);
+      
+      //console.log(elves.game);
+      console.log("Answer for part1:",part1);      
+      console.log("Answer for part2:",part2);
+      console.timeEnd('day24');
+      console.log("=============EOF Day24===========")
+      return r({part1,part2})
+    })
+    await new Promise(async(r,b)=>{
+      console.log("============Start Day25==========")
+      console.time('day25');
+      let input = await rf('./25/input');
+      let {i,part1,part2} = await day25(input,debug,fancyprint);
+      //console.log(i,part1,part2);
+      console.log("Answer for part1:",part1);      
+      console.log("Answer for part2:",part2);
+      console.timeEnd('day25');
+      console.log("=============EOF Day25===========")
       return r({part1,part2})
     })
   })()
